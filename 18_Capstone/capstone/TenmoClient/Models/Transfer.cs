@@ -6,6 +6,7 @@ namespace TenmoClient.Models
 {
     public class Transfer
     {
+        public int transferId { get; set; }
         public int transferTypeId { get; set; } = 2;
         public int transferStatusId { get; set; } = 2;
         public int accountFrom { get; set; }

@@ -81,6 +81,8 @@ namespace TenmoClient
             if (menuSelection == 2)
             {
                 // View your past transfers
+                GetTransfers();
+                return true;
             }
 
             if (menuSelection == 3)
@@ -186,6 +188,42 @@ namespace TenmoClient
                 Console.WriteLine($"|  {user.UserId} | {user.Username}                   |");
             }
             Console.WriteLine("|-------+---------------------------|");          
+        }
+
+        //Transfer History Get
+        private void GetTransfers()
+        {
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Transfers                                  ");
+            Console.WriteLine("ID          From/To                 Amount ");
+            Console.WriteLine("-------------------------------------------");
+
+            List<Transfer> transfers = tenmoApiService.GetTransfers();
+            foreach(Transfer transfer in transfers)
+            {
+                int transferId = transfer.transferId;              
+                decimal amount = transfer.amount;
+                string fromTo = null;
+                if(transfer.accountFrom == tenmoApiService.UserId)
+                {
+                    fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountTo).Username}";
+                }
+                else
+                {
+                    fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountFrom).Username}";
+                }
+                Console.WriteLine($"{transferId}      {fromTo}            {amount:C}");
+            }
+            Console.WriteLine("---------                                  ");
+            int choice = console.PromptForInteger("Please enter transfer ID to view details (0 to cancel): ", null);
+            if(choice == 0)
+            {
+                return;
+            }
+            else 
+            {
+                PrintTransferDetails(choice);
+            }
         }
 
         //Send Money Method

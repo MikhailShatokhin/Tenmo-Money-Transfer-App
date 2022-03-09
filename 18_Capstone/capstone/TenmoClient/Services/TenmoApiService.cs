@@ -56,6 +56,24 @@ namespace TenmoClient.Services
                 return response.Data;
             }
         }
+        public User GetUserName(int userId)
+        {
+            RestRequest request = new RestRequest($"{ApiUrl}user/{userId}");
+            IRestResponse<User> response = client.Get<User>(request);
+
+            if (response.ResponseStatus != ResponseStatus.Completed)
+            {
+                throw new Exception("Error occurred - unable to reach server.");
+            }
+            else if (!response.IsSuccessful)
+            {
+                throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
+            }
+            else
+            {
+                return response.Data;
+            }
+        }
 
         public bool TransferMoney(int toUserId, decimal sendAmount, int fromUserId)
         {
@@ -67,7 +85,7 @@ namespace TenmoClient.Services
             RestRequest request = new RestRequest($"{ApiUrl}transfer");
             request.AddJsonBody(newTransfer);
             IRestResponse<Transfer> response = client.Post<Transfer>(request);
-
+            //IRestResponse<Transfer> response2 = client.Put<Transfer>(request);
             if (response.ResponseStatus != ResponseStatus.Completed)
             {
                 throw new Exception("Error occurred - unable to reach server.");
@@ -76,6 +94,14 @@ namespace TenmoClient.Services
             {
                 throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
             }
+            //else if (!response2.IsSuccessful)
+            //{
+            //    throw new Exception("Error occurred - received non-success response: " + (int)response2.StatusCode);
+            //}
+            //else if (response2.ResponseStatus != ResponseStatus.Completed)
+            //{
+            //    throw new Exception("Error occurred - unable to reach server.");
+            //}
             else
             {
                 return true;

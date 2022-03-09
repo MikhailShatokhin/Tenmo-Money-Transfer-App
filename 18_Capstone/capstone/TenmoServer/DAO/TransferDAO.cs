@@ -12,7 +12,7 @@ namespace TenmoServer.DAO
     {
         private string connectionString;
         private string sqlInsertTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                                          "VALUES (@transferTypeId, @transferStatusId, @accountFrom, @accountTo, @amount) ";
+                                          "VALUES (@transferTypeId, @transferStatusId, (select account_id from account where user_id = @accountFrom), (select account_id from account where user_id = @accountTo), @amount); ";
         private string sqlAddBalance = "UPDATE account SET balance = balance + @amount WHERE user_id = @userId";
         private string sqlMinusBalance = "UPDATE account SET balance = balance - @amount WHERE user_id = @userId";
 
@@ -23,27 +23,35 @@ namespace TenmoServer.DAO
 
         public void TransferMoney(Transfer transfer)
         {
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sqlInsertTransfer, conn);
-                cmd.Parameters.AddWithValue("@transferTypeId", transfer.transferTypeId);
-                cmd.Parameters.AddWithValue("@transferStatusId", transfer.transferStatusId);
-                cmd.Parameters.AddWithValue("@accountFrom", transfer.accountFrom);
-                cmd.Parameters.AddWithValue("@accountTo", transfer.accountTo);
-                cmd.Parameters.AddWithValue("@amount", transfer.amount);
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(sqlInsertTransfer, conn);
+                    cmd.Parameters.AddWithValue("@transferTypeId", transfer.transferTypeId);
+                    cmd.Parameters.AddWithValue("@transferStatusId", transfer.transferStatusId);
+                    cmd.Parameters.AddWithValue("@accountFrom", transfer.accountFrom);
+                    cmd.Parameters.AddWithValue("@accountTo", transfer.accountTo);
+                    cmd.Parameters.AddWithValue("@amount", transfer.amount);
+                    cmd.ExecuteNonQuery();
 
-                SqlCommand cmd2 = new SqlCommand(sqlAddBalance, conn);
-                cmd2.Parameters.AddWithValue("@amount", transfer.amount);
-                cmd2.Parameters.AddWithValue("@userId", transfer.accountTo);
+                    SqlCommand cmd2 = new SqlCommand(sqlAddBalance, conn);
+                    cmd2.Parameters.AddWithValue("@amount", transfer.amount);
+                    cmd2.Parameters.AddWithValue("@userId", transfer.accountTo);
+                    cmd2.ExecuteNonQuery();
 
-                SqlCommand cmd3 = new SqlCommand(sqlMinusBalance, conn);
-                cmd3.Parameters.AddWithValue("@amount", transfer.amount);
-                cmd3.Parameters.AddWithValue("@userId", transfer.accountFrom);
-
-
+                    SqlCommand cmd3 = new SqlCommand(sqlMinusBalance, conn);
+                    cmd3.Parameters.AddWithValue("@amount", transfer.amount);
+                    cmd3.Parameters.AddWithValue("@userId", transfer.accountFrom);
+                    cmd3.ExecuteNonQuery();
+                }
             }
+            catch (SqlException)
+            {
+                throw;
+            }
+            
         }
     }
 }
