@@ -13,13 +13,13 @@ namespace TenmoServer.Controllers
 {
     [Route("balance")]
     [ApiController]
-    public class TenmoController : ControllerBase
+    public class BalanceController : ControllerBase
     {
         //private User userId;
-        private ITenmoDAO tenmoDAO;
-        private IUserDao UserDao;
+        private IBalanceDAO tenmoDAO;
+        //private IUserDao UserDao;
 
-        public TenmoController(ITenmoDAO tenmoDAO)
+        public BalanceController(IBalanceDAO tenmoDAO)
         {
             this.tenmoDAO = tenmoDAO;
             //this.userId = userId;
@@ -33,6 +33,7 @@ namespace TenmoServer.Controllers
             decimal balance = tenmoDAO.GetBalance(userId);
             return Ok(balance);
         }
+
 
     }
 }

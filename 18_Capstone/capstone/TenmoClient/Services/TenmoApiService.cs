@@ -38,5 +38,49 @@ namespace TenmoClient.Services
             }
         }
 
+        public List<User> GetUsers()
+        {
+            RestRequest request = new RestRequest($"{ApiUrl}user");
+            IRestResponse<List<User>> response = client.Get<List<User>>(request);
+
+            if (response.ResponseStatus != ResponseStatus.Completed)
+            {
+                throw new Exception("Error occurred - unable to reach server.");
+            }
+            else if (!response.IsSuccessful)
+            {
+                throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
+            }
+            else
+            {
+                return response.Data;
+            }
+        }
+
+        public bool TransferMoney(int toUserId, decimal sendAmount, int fromUserId)
+        {
+            Transfer newTransfer = new Transfer();
+            newTransfer.accountTo = toUserId;
+            newTransfer.accountFrom = fromUserId;
+            newTransfer.amount = sendAmount;
+
+            RestRequest request = new RestRequest($"{ApiUrl}transfer");
+            request.AddJsonBody(newTransfer);
+            IRestResponse<Transfer> response = client.Post<Transfer>(request);
+
+            if (response.ResponseStatus != ResponseStatus.Completed)
+            {
+                throw new Exception("Error occurred - unable to reach server.");
+            }
+            else if (!response.IsSuccessful)
+            {
+                throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
     }
 }

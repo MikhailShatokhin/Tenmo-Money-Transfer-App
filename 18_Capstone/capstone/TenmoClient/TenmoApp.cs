@@ -73,7 +73,8 @@ namespace TenmoClient
 
             if (menuSelection == 1)
             {
-                GetBalance();
+                // Get your current balance
+                GetBalance();           
                 return true;
             }
 
@@ -90,6 +91,9 @@ namespace TenmoClient
             if (menuSelection == 4)
             {
                 // Send TE bucks
+                GetUsers();
+                TransferMoney();               
+                return true;
             }
 
             if (menuSelection == 5)
@@ -166,7 +170,60 @@ namespace TenmoClient
             decimal balance = tenmoApiService.GetBalance(tenmoApiService.UserId);
 
             Console.WriteLine($"Your current account balance is: {balance:C}");
+            console.Pause();
+        }
 
+        //List User Method
+        private void GetUsers()
+        {
+            Console.WriteLine("|-------------- Users --------------|");
+            Console.WriteLine("|    Id | Username                  |");
+            Console.WriteLine("|-------+---------------------------|");
+
+            List<User> users = tenmoApiService.GetUsers();
+            foreach (User user in users)
+            {
+                Console.WriteLine($"|  {user.UserId} | {user.Username}                   |");
+            }
+            Console.WriteLine("|-------+---------------------------|");          
+        }
+
+        //Send Money Method
+        private void TransferMoney()
+        {
+            int toUserId = console.PromptForInteger($"Id of the user you are sending to [0]", null);
+
+            List<User> users = tenmoApiService.GetUsers();
+            foreach (User user in users)
+            {
+                if(user.UserId == toUserId)
+                {
+                    continue;
+                }
+                else
+                {
+                    console.PrintError("Invalid UserId.");
+                    console.Pause();
+                    return;
+                }
+            }
+            decimal sendAmount = console.PromptForDecimal($"Enter the amount to send", null);
+            if (sendAmount <= 0)
+            {
+                console.PrintError("Send amount must be greater than 0.");
+                console.Pause();
+                return;
+            }
+            else if (sendAmount > tenmoApiService.GetBalance(tenmoApiService.UserId))
+            {
+                console.PrintError("Send amount must be less than your current balance.");
+                console.Pause();
+                return;
+            }
+            else
+            {
+                tenmoApiService.TransferMoney(toUserId,sendAmount,tenmoApiService.UserId);
+            }
         }
     }
 }

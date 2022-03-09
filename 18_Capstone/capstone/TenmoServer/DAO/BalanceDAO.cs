@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace TenmoServer.DAO
 {
-    public class TenmoDAO : ITenmoDAO
+    public class BalanceDAO : IBalanceDAO
     {
         private string connectionString;
         private string sqlGetBalance = "SELECT balance FROM account WHERE user_id = ";
 
-        public TenmoDAO(string connectionString)
+        public BalanceDAO(string connectionString)
         {
             this.connectionString = connectionString;
         }
