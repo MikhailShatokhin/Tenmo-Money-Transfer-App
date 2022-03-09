@@ -24,11 +24,12 @@ namespace TenmoServer.Controllers
         }
 
         //Transfer Method
-        [HttpPut]
+        [HttpPost]
         //[AllowAnonymous]
-        public void TransferMoney(Transfer transfer)
+        public ActionResult TransferMoney(Transfer transfer)
         {
             tenmoDAO.TransferMoney(transfer);
+            return Ok();
             
         }
     } 

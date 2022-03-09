@@ -192,21 +192,12 @@ namespace TenmoClient
         private void TransferMoney()
         {
             int toUserId = console.PromptForInteger($"Id of the user you are sending to [0]", null);
-
-            List<User> users = tenmoApiService.GetUsers();
-            foreach (User user in users)
+           
+            if(SameUser(toUserId) || !UserExists(toUserId))
             {
-                if(user.UserId == toUserId)
-                {
-                    continue;
-                }
-                else
-                {
-                    console.PrintError("Invalid UserId.");
-                    console.Pause();
-                    return;
-                }
+                return;
             }
+            
             decimal sendAmount = console.PromptForDecimal($"Enter the amount to send", null);
             if (sendAmount <= 0)
             {
@@ -224,6 +215,42 @@ namespace TenmoClient
             {
                 tenmoApiService.TransferMoney(toUserId,sendAmount,tenmoApiService.UserId);
             }
+        }
+        private bool SameUser(int toUserId)
+        {
+            bool sameUser = false;
+            List<User> users = tenmoApiService.GetUsers();
+            foreach(User user in users)
+            {
+                if (toUserId == tenmoApiService.UserId)
+                {
+                    sameUser = true;                 
+                }
+            }
+            if(sameUser)
+            {
+                console.PrintError("Cannot send money to yourself. Please try again.");
+                console.Pause();
+            }          
+            return sameUser;
+        }
+        public bool UserExists(int toUserId)
+        {
+            bool userExists = false;
+            List<User> users = tenmoApiService.GetUsers();
+            foreach (User user in users)
+            {
+                if (user.UserId == toUserId)
+                {
+                    userExists = true;
+                }
+            }
+            if (!userExists)
+            {
+                console.PrintError("Invalid UserId.");
+                console.Pause();              
+            }
+            return userExists;
         }
     }
 }

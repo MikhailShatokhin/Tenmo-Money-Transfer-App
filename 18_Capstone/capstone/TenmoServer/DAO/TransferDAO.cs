@@ -8,7 +8,7 @@ using TenmoServer.Models;
 
 namespace TenmoServer.DAO
 {
-    public class TransferDAO
+    public class TransferDAO : ITransferDAO
     {
         private string connectionString;
         private string sqlInsertTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
