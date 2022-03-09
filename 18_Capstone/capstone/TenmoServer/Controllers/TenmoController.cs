@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Exchange.WebServices.Data;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,13 @@ using TenmoServer.Models;
 
 namespace TenmoServer.Controllers
 {
-    [Route("[controller]")]
+    [Route("balance")]
     [ApiController]
     public class TenmoController : ControllerBase
     {
-        private User userId;
+        //private User userId;
         private ITenmoDAO tenmoDAO;
-        //private IUserDao UserDao;
+        private IUserDao UserDao;
 
         public TenmoController(ITenmoDAO tenmoDAO)
         {
@@ -25,7 +26,8 @@ namespace TenmoServer.Controllers
         }
         
         //GetBalance Method
-        [HttpGet("balance/{userId}")]
+        [HttpGet("{userId}")]
+        //[AllowAnonymous]
         public ActionResult<decimal> GetBalance(int userId)
         {
             decimal balance = tenmoDAO.GetBalance(userId);

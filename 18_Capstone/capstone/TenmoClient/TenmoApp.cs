@@ -165,7 +165,7 @@ namespace TenmoClient
         {
             decimal balance = tenmoApiService.GetBalance(tenmoApiService.UserId);
 
-            Console.WriteLine($"Your current account balance is: ${balance}");
+            Console.WriteLine($"Your current account balance is: {balance:C}");
 
         }
     }

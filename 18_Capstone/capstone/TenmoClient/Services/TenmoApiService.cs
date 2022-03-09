@@ -8,6 +8,7 @@ namespace TenmoClient.Services
     public class TenmoApiService : AuthenticatedApiService
     {
         public readonly string ApiUrl = "https://localhost:44315/";
+
         //protected static RestClient client = null;
 
         public TenmoApiService(string apiUrl) : base(apiUrl) { }
@@ -15,6 +16,7 @@ namespace TenmoClient.Services
         // Add methods to call api here...
 
         //GetBalance Method
+        
         public decimal GetBalance(int userId)
         {
             //decimal balance = 0.00M;

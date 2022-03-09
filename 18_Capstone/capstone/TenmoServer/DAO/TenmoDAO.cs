@@ -9,7 +9,7 @@ namespace TenmoServer.DAO
     public class TenmoDAO : ITenmoDAO
     {
         private string connectionString;
-        private string sqlGetBalance = "SELECT balance FROM account WHERE user_id = ;";
+        private string sqlGetBalance = "SELECT balance FROM account WHERE user_id = ";
 
         public TenmoDAO(string connectionString)
         {
