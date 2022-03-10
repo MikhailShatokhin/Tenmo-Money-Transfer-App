@@ -73,12 +73,16 @@ namespace TenmoClient
 
             if (menuSelection == 1)
             {
-                // View your current balance
+                // Get your current balance
+                GetBalance();           
+                return true;
             }
 
             if (menuSelection == 2)
             {
                 // View your past transfers
+                GetTransfers();
+                return true;
             }
 
             if (menuSelection == 3)
@@ -89,6 +93,9 @@ namespace TenmoClient
             if (menuSelection == 4)
             {
                 // Send TE bucks
+                GetUsers();
+                TransferMoney();               
+                return true;
             }
 
             if (menuSelection == 5)
@@ -157,6 +164,131 @@ namespace TenmoClient
                 console.PrintError("Registration was unsuccessful.");
             }
             console.Pause();
+        }
+
+        //Get Balance Method
+        private void GetBalance()
+        {
+            decimal balance = tenmoApiService.GetBalance(tenmoApiService.UserId);
+
+            Console.WriteLine($"Your current account balance is: {balance:C}");
+            console.Pause();
+        }
+
+        //List User Method
+        private void GetUsers()
+        {
+            Console.WriteLine("|-------------- Users --------------|");
+            Console.WriteLine("|    Id | Username                  |");
+            Console.WriteLine("|-------+---------------------------|");
+
+            List<User> users = tenmoApiService.GetUsers();
+            foreach (User user in users)
+            {
+                Console.WriteLine($"|  {user.UserId} | {user.Username}                   |");
+            }
+            Console.WriteLine("|-------+---------------------------|");          
+        }
+
+        //Transfer History Get
+        private void GetTransfers()
+        {
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Transfers                                  ");
+            Console.WriteLine("ID          From/To                 Amount ");
+            Console.WriteLine("-------------------------------------------");
+
+            List<Transfer> transfers = tenmoApiService.GetTransfers();
+            foreach(Transfer transfer in transfers)
+            {
+                int transferId = transfer.transferId;              
+                decimal amount = transfer.amount;
+                string fromTo = null;
+                if(transfer.accountFrom == tenmoApiService.UserId)
+                {
+                    fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountTo).Username}";
+                }
+                else
+                {
+                    fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountFrom).Username}";
+                }
+                Console.WriteLine($"{transferId}      {fromTo}            {amount:C}");
+            }
+            Console.WriteLine("---------                                  ");
+            int choice = console.PromptForInteger("Please enter transfer ID to view details (0 to cancel): ", null);
+            if(choice == 0)
+            {
+                return;
+            }
+            else 
+            {
+                PrintTransferDetails(choice);
+            }
+        }
+
+        //Send Money Method
+        private void TransferMoney()
+        {
+            int toUserId = console.PromptForInteger($"Id of the user you are sending to [0]", null);
+           
+            if(SameUser(toUserId) || !UserExists(toUserId))
+            {
+                return;
+            }
+            
+            decimal sendAmount = console.PromptForDecimal($"Enter the amount to send", null);
+            if (sendAmount <= 0)
+            {
+                console.PrintError("Send amount must be greater than 0.");
+                console.Pause();
+                return;
+            }
+            else if (sendAmount > tenmoApiService.GetBalance(tenmoApiService.UserId))
+            {
+                console.PrintError("Send amount must be less than your current balance.");
+                console.Pause();
+                return;
+            }
+            else
+            {
+                tenmoApiService.TransferMoney(toUserId,sendAmount,tenmoApiService.UserId);
+            }
+        }
+        private bool SameUser(int toUserId)
+        {
+            bool sameUser = false;
+            List<User> users = tenmoApiService.GetUsers();
+            foreach(User user in users)
+            {
+                if (toUserId == tenmoApiService.UserId)
+                {
+                    sameUser = true;                 
+                }
+            }
+            if(sameUser)
+            {
+                console.PrintError("Cannot send money to yourself. Please try again.");
+                console.Pause();
+            }          
+            return sameUser;
+        }
+        public bool UserExists(int toUserId)
+        {
+            bool userExists = false;
+            List<User> users = tenmoApiService.GetUsers();
+            foreach (User user in users)
+            {
+                if (user.UserId == toUserId)
+                {
+                    userExists = true;
+                }
+            }
+            if (!userExists)
+            {
+                console.PrintError("Invalid UserId.");
+                console.Pause();              
+            }
+            return userExists;
         }
     }
 }

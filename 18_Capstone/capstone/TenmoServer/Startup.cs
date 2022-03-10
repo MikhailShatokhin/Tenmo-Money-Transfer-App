@@ -55,6 +55,10 @@ namespace TenmoServer
             services.AddSingleton<IPasswordHasher>(sp => new PasswordHasher());
 
             services.AddTransient<IUserDao>(sp => new UserSqlDao(connectionString));
+            ///////
+            services.AddTransient<IBalanceDAO>(sp => new BalanceDAO(connectionString));
+            services.AddTransient<ITransferDAO>(sp => new TransferDAO(connectionString));   
+            ///////
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
