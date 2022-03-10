@@ -27,7 +27,7 @@ namespace TenmoServer.DAO
             "   join tenmo_user tu1 on tu1.[user_id] = a1.user_id 	" +
             "   join tenmo_user tu2 on tu2.[user_id] = a2.user_id " +
             "where 	" +
-            "   (t.account_from = @userId or t.account_to = @userId)";
+            "   (a1.user_id = @userId or a2.user_id = @userId)";
 
 
 
@@ -105,7 +105,7 @@ namespace TenmoServer.DAO
                 u.transferStatusId = Convert.ToInt32(reader["transfer_status_id"]);
                 u.accountFrom = Convert.ToInt32(reader["account_from"]);
                 u.accountTo = Convert.ToInt32(reader["account_to"]);
-                u.amount = Convert.ToInt32(reader["amount"]);
+                u.amount = Convert.ToDecimal(reader["amount"]);
                 u.stringTransferStatus = Convert.ToString(reader["transfer_status_desc"]);
                 u.stringTransferType = Convert.ToString(reader["transfer_type_desc"]);
                 u.stringAccountFrom = Convert.ToString(reader["From"]);
