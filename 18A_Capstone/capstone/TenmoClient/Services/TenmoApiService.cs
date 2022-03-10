@@ -7,15 +7,19 @@ namespace TenmoClient.Services
 {
     public class TenmoApiService : AuthenticatedApiService
     {
-        public readonly string ApiUrl;
+        public readonly string ApiUrl = "https://localhost:44315/";
+
+        //protected static RestClient client = null;
 
         public TenmoApiService(string apiUrl) : base(apiUrl) { }
 
         // Add methods to call api here...
+
         //GetBalance Method
 
         public decimal GetBalance(int userId)
         {
+
             RestRequest request = new RestRequest($"{ApiUrl}balance/{userId}");
             IRestResponse<decimal> response = client.Get<decimal>(request);
 
@@ -80,7 +84,7 @@ namespace TenmoClient.Services
             RestRequest request = new RestRequest($"{ApiUrl}transfer");
             request.AddJsonBody(newTransfer);
             IRestResponse<Transfer> response = client.Post<Transfer>(request);
-            //IRestResponse<Transfer> response2 = client.Put<Transfer>(request);
+
             if (response.ResponseStatus != ResponseStatus.Completed)
             {
                 throw new Exception("Error occurred - unable to reach server.");
@@ -89,19 +93,29 @@ namespace TenmoClient.Services
             {
                 throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
             }
-            //else if (!response2.IsSuccessful)
-            //{
-            //    throw new Exception("Error occurred - received non-success response: " + (int)response2.StatusCode);
-            //}
-            //else if (response2.ResponseStatus != ResponseStatus.Completed)
-            //{
-            //    throw new Exception("Error occurred - unable to reach server.");
-            //}
             else
             {
                 return true;
             }
         }
 
+        public List<Transfer> GetTransfers(int userId)
+        {
+            RestRequest request = new RestRequest($"{ApiUrl}transfer/{userId}");
+            IRestResponse<List<Transfer>> response = client.Get<List<Transfer>>(request);
+
+            if (response.ResponseStatus != ResponseStatus.Completed)
+            {
+                throw new Exception("Error occurred - unable to reach server.");
+            }
+            else if (!response.IsSuccessful)
+            {
+                throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
+            }
+            else
+            {
+                return response.Data;
+            }
+        }
     }
 }

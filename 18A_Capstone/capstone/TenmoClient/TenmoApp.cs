@@ -198,32 +198,79 @@ namespace TenmoClient
             Console.WriteLine("ID          From/To                 Amount ");
             Console.WriteLine("-------------------------------------------");
 
-            //List<Transfer> transfers = tenmoApiService.GetTransfers();
-            //foreach (Transfer transfer in transfers)
-            //{
-            //    int transferId = transfer.transferId;
-            //    decimal amount = transfer.amount;
-            //    string fromTo = null;
-            //    if (transfer.accountFrom == tenmoApiService.UserId)
-            //    {
-            //        fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountTo).Username}";
-            //    }
-            //    else
-            //    {
-            //        fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountFrom).Username}";
-            //    }
-            //    Console.WriteLine($"{transferId}      {fromTo}            {amount:C}");
-            //}
-            //Console.WriteLine("---------                                  ");
-            //int choice = console.PromptForInteger("Please enter transfer ID to view details (0 to cancel): ", null);
-            //if (choice == 0)
-            //{
-            //    return;
-            //}
-            //else
-            //{
-            //    PrintTransferDetails(choice);
-            //}
+            List<Transfer> transfers = tenmoApiService.GetTransfers(tenmoApiService.UserId);
+            foreach (Transfer transfer in transfers)
+            {                
+                string fromTo = null;
+                if (transfer.accountFrom == tenmoApiService.UserId)
+                {
+                    fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountTo).Username}";
+                }
+                else
+                {
+                    fromTo = $"To: {tenmoApiService.GetUserName(transfer.accountFrom).Username}";
+                }
+                Console.WriteLine($"{transfer.transferId}      {fromTo}            {transfer.amount:C}");
+            }
+            Console.WriteLine("-------------------------------------------");
+            int choice = console.PromptForInteger("Please enter transfer ID to view details (0 to cancel): ", null);
+            if (choice == 0)
+            {
+                return;
+            }
+            else
+            {
+                foreach (Transfer transfer in transfers)
+                {
+                    if(transfer.transferId == choice)
+                    {
+                        Console.WriteLine("--------------------------------------------");
+                        Console.WriteLine("Transfer Details");
+                        Console.WriteLine("--------------------------------------------");
+                        Console.WriteLine($"Id: {transfer.transferId}");
+                        Console.WriteLine($"From: {transfer.stringAccountFrom}");
+                        Console.WriteLine($"To: {transfer.stringAccountTo}");
+                        Console.WriteLine($"Type: {transfer.stringTransferType}");
+                        Console.WriteLine($"Amount: {transfer.amount:C}");
+                        console.Pause();
+                    }
+                }
+            }
+        }
+
+        private void PrintTransferDetails(int choice)
+        {
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Transfers Details                          ");
+            Console.WriteLine("-------------------------------------------");
+
+            List<Transfer> transfers = tenmoApiService.GetTransfers(tenmoApiService.UserId);
+            foreach (Transfer transfer in transfers)
+            {
+                int transferId = transfer.transferId;
+                decimal amount = transfer.amount;
+                string from = transfer.stringAccountFrom;
+                string to = transfer.stringAccountTo;
+                int transferType = transfer.transferTypeId;
+                int transferStatus = transfer.transferStatusId;
+
+                if (transfer.accountFrom == tenmoApiService.UserId)
+                {
+                    from = $"To: {tenmoApiService.GetUserName(transfer.accountTo).Username}";
+                }
+                else
+                {
+                    to = $"To: {tenmoApiService.GetUserName(transfer.accountFrom).Username}";
+                }
+                Console.WriteLine($"Id: {transferId}"); //change to string property
+                Console.WriteLine($"From: {from}"); //change to string property and we can delete the above if statement
+                Console.WriteLine($"To: {to}"); //change to string property and we can delete the above if statement
+                Console.WriteLine($"Type: {transferType}"); //change to string property
+                Console.WriteLine($"Status: {transferStatus}"); //change to string property
+                Console.WriteLine($"Amount: {amount:C}");
+
+            }
+
         }
 
         //Send Money Method

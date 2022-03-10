@@ -9,5 +9,6 @@ namespace TenmoServer.DAO
     public interface ITransferDAO
     {
         void TransferMoney(Transfer transfer);
+        List<Transfer> GetTransfers(int userId);
     }
 }

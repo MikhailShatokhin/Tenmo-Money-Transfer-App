@@ -32,5 +32,12 @@ namespace TenmoServer.Controllers
             return Ok();
 
         }
+
+        [HttpGet("{userId}")]
+        public ActionResult<List<Transfer>> GetTransfers(int userId)
+        {
+            List<Transfer> result = tenmoDAO.GetTransfers(userId);
+            return Ok(result);
+        }
     }
 }
