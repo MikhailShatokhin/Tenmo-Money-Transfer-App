@@ -88,6 +88,8 @@ namespace TenmoClient
             if (menuSelection == 3)
             {
                 // View your pending requests
+                GetRequests();
+                return true;
             }
 
             if (menuSelection == 4)
@@ -101,6 +103,9 @@ namespace TenmoClient
             if (menuSelection == 5)
             {
                 // Request TE bucks
+                GetUsers();
+                RequestMoney();
+                return true;
             }
 
             if (menuSelection == 6)
@@ -205,7 +210,7 @@ namespace TenmoClient
                 transferIds.Add(transfer.transferId);
                 string fromTo = null;
                 string fromToText = null;
-                if (transfer.accountFrom == (tenmoApiService.UserId+1000))
+                if (transfer.accountFrom == (tenmoApiService.GetUserName(tenmoApiService.UserId).AccountId)) //ToDo +1000 bandaid
                 {
                     fromTo = "To:  ";
                     fromToText = $"{transfer.stringAccountTo}";
@@ -215,11 +220,10 @@ namespace TenmoClient
                     fromTo = "From:";
                     fromToText = $"{transfer.stringAccountFrom}";
                 }
-                
-                Console.WriteLine($"{transfer.transferId.ToString().PadRight(12, ' ')}{fromTo}{PadBoth(fromToText, 18)}${transfer.amount.ToString().PadLeft(7,' ')}");
+                Console.WriteLine($"{transfer.transferId.ToString().PadRight(12, ' ')}{fromTo} {fromToText.PadRight(17, ' ')}${transfer.amount.ToString("n2").PadLeft(7, ' ')}");
             }
-            Console.WriteLine("-------------------------------------------");
-            int choice = console.PromptForInteger("Please enter transfer ID to view details (0 to cancel): ", null);
+            Console.WriteLine("---------                                  ");
+            int choice = console.PromptForInteger("Please enter transfer ID to view details (0 to cancel) ", null);
             if (choice == 0)
             {
                 return;
@@ -244,19 +248,102 @@ namespace TenmoClient
                         Console.WriteLine($"Type: {transfer.stringTransferType}");
                         Console.WriteLine($"Status: {transfer.stringTransferStatus}");
                         Console.WriteLine($"Amount: {transfer.amount:C}");
+                        Console.WriteLine();
                         console.Pause();
                     }
                 }
             }
         }
 
-        public string PadBoth(string source, int length)
+        //Request History Get
+        private void GetRequests()
         {
-            int spaces = length - source.Length;
-            int padLeft = spaces / 2 + source.Length;
-            return source.PadLeft(padLeft).PadRight(length);
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Pending Transfers                          ");
+            Console.WriteLine("ID          To                      Amount ");
+            Console.WriteLine("-------------------------------------------");
+
+            List<Transfer> transfers = tenmoApiService.GetRequests(tenmoApiService.UserId);
+            HashSet<int> transferIds = new HashSet<int>();
+            foreach (Transfer transfer in transfers)
+            {
+                transferIds.Add(transfer.transferId);
+                string fromTo = null;
+                string fromToText = null;
+                if (transfer.accountFrom == (tenmoApiService.GetUserName(tenmoApiService.UserId).AccountId)) //ToDo +1000 bandaid
+                {
+                    fromTo = "To:  ";
+                    fromToText = $"{transfer.stringAccountTo}";
+                }
+                else
+                {
+                    fromTo = "From:";
+                    fromToText = $"{transfer.stringAccountFrom}";
+                }
+                Console.WriteLine($"{transfer.transferId.ToString().PadRight(12, ' ')}{fromTo} {fromToText.PadRight(17, ' ')}${transfer.amount.ToString("n2").PadLeft(7, ' ')}");
+            }
+            Console.WriteLine("--------                                    ");
+            int choice = console.PromptForInteger("Please enter transfer ID to approve/reject (0 to cancel) ", null);
+            if (choice == 0)
+            {
+                return;
+            }
+            else if (!transferIds.Contains(choice))
+            {
+                console.PrintError("Not a valid transfer Id.");
+                console.Pause();
+            }
+            else
+            {             
+                ApproveReject(PullTransferFromList(choice, transfers));              
+            }
         }
 
+        private Transfer PullTransferFromList(int choice, List<Transfer> transfers)
+        {
+            Transfer transfer = new Transfer();
+            foreach (Transfer item in transfers)
+            {
+                if(choice == item.transferId)
+                {
+                    transfer = item;
+                }
+            }
+            return transfer;
+        }
+
+        private void ApproveReject(Transfer transfer)
+        {
+            Console.WriteLine("1: Approve");
+            Console.WriteLine("2: Reject");
+            Console.WriteLine("0: Don't approve or reject");
+            Console.WriteLine("---------");
+            int choice = console.PromptForInteger("Please choose an option ", null);
+            if (choice == 1)
+            {          
+                tenmoApiService.Approve(transfer);
+                console.PrintSuccess("Successfully approved the transfer.");
+                console.Pause();
+            }
+            else if (choice == 2)
+            {
+                tenmoApiService.Reject(transfer);
+                console.PrintSuccess("Successfully rejected the transfer.");
+                console.Pause();
+            }
+            else
+            {
+                console.PrintSuccess("Nothing was approved or rejected.");
+                console.Pause();
+            }
+        }
+
+        //public string PadBoth(string source, int length)
+        //{
+        //    int spaces = length - source.Length;
+        //    int padLeft = spaces / 2 + source.Length;
+        //    return source.PadLeft(padLeft).PadRight(length);
+        //}
 
         //Send Money Method
         private void TransferMoney()
@@ -285,6 +372,30 @@ namespace TenmoClient
             {
                 tenmoApiService.TransferMoney(toUserId, sendAmount, tenmoApiService.UserId);
                 console.PrintSuccess("Money successfully sent!");
+                console.Pause();
+            }
+        }
+        //Request Money Method
+        private void RequestMoney()
+        {
+            int fromUserId = console.PromptForInteger($"Id of the user you are requesting from [0]", null);
+
+            if (SameUser(fromUserId) || !UserExists(fromUserId))
+            {
+                return;
+            }
+
+            decimal requestAmount = console.PromptForDecimal($"Enter the amount to request", null);
+            if (requestAmount <= 0)
+            {
+                console.PrintError("Request amount must be greater than 0.");
+                console.Pause();
+                return;
+            }
+            else
+            {
+                tenmoApiService.RequestMoney(fromUserId, requestAmount, tenmoApiService.UserId);
+                console.PrintSuccess("Money successfully requested!");
                 console.Pause();
             }
         }

@@ -58,6 +58,7 @@ namespace TenmoServer
             ///////
             services.AddTransient<IBalanceDAO>(sp => new BalanceDAO(connectionString));
             services.AddTransient<ITransferDAO>(sp => new TransferDAO(connectionString));
+            services.AddTransient<IRequestDAO>(sp => new RequestDAO(connectionString));
             ///////
         }
 
