@@ -210,7 +210,7 @@ namespace TenmoClient
                 transferIds.Add(transfer.transferId);
                 string fromTo = null;
                 string fromToText = null;
-                if (transfer.accountFrom == (tenmoApiService.GetUserName(tenmoApiService.UserId).AccountId)) //ToDo +1000 bandaid
+                if (transfer.accountFrom == (tenmoApiService.GetAccountId(tenmoApiService.UserId))) //ToDo +1000 bandaid
                 {
                     fromTo = "To:  ";
                     fromToText = $"{transfer.stringAccountTo}";
@@ -270,7 +270,7 @@ namespace TenmoClient
                 transferIds.Add(transfer.transferId);
                 string fromTo = null;
                 string fromToText = null;
-                if (transfer.accountFrom == (tenmoApiService.GetUserName(tenmoApiService.UserId).AccountId)) //ToDo +1000 bandaid
+                if (transfer.accountFrom == (tenmoApiService.GetAccountId(tenmoApiService.UserId))) //ToDo +1000 bandaid
                 {
                     fromTo = "To:  ";
                     fromToText = $"{transfer.stringAccountTo}";

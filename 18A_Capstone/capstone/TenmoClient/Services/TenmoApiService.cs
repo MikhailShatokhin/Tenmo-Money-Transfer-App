@@ -207,5 +207,23 @@ namespace TenmoClient.Services
                 return;
             }
         }
+        public int GetAccountId(int userId)
+        {
+            RestRequest request = new RestRequest($"{ApiUrl}getAccount/{userId}");
+            IRestResponse<int> response = client.Get<int>(request);
+
+            if (response.ResponseStatus != ResponseStatus.Completed)
+            {
+                throw new Exception("Error occurred - unable to reach server.");
+            }
+            else if (!response.IsSuccessful)
+            {
+                throw new Exception("Error occurred - received non-success response: " + (int)response.StatusCode);
+            }
+            else
+            {
+                return response.Data;
+            }
+        }
     }
 }

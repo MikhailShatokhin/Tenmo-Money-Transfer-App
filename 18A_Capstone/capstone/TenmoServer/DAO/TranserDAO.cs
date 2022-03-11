@@ -17,7 +17,7 @@ namespace TenmoServer.DAO
         private string sqlMinusBalance = "UPDATE account SET balance = balance - @amount WHERE user_id = @userId";
         private string sqlListTransfers = "" +
             "select " +
-            "   t.*,ts.transfer_status_desc, tt.transfer_type_desc, tu1.username [From], tu2.username [To] " +
+            "   t.*,ts.transfer_status_desc, tt.transfer_type_desc, tu1.username [From], tu2.username [To]  " +
             "from " +
             "   transfer t  	" +
             "   join transfer_status ts on ts.transfer_status_id = t.transfer_status_id 	" +

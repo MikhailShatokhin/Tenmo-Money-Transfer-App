@@ -115,7 +115,6 @@ namespace TenmoServer.DAO
                 Username = Convert.ToString(reader["username"]),
                 PasswordHash = Convert.ToString(reader["password_hash"]),
                 Salt = Convert.ToString(reader["salt"]),
-                AccountId = Convert.ToInt32(reader["account_id"]),
             };
 
             return u;
