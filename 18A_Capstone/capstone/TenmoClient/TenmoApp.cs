@@ -210,7 +210,7 @@ namespace TenmoClient
                 transferIds.Add(transfer.transferId);
                 string fromTo = null;
                 string fromToText = null;
-                if (transfer.accountFrom == (tenmoApiService.GetAccountId(tenmoApiService.UserId))) //ToDo +1000 bandaid
+                if (transfer.accountFrom == (tenmoApiService.GetAccountId(tenmoApiService.UserId)))
                 {
                     fromTo = "To:  ";
                     fromToText = $"{transfer.stringAccountTo}";
@@ -270,7 +270,7 @@ namespace TenmoClient
                 transferIds.Add(transfer.transferId);
                 string fromTo = null;
                 string fromToText = null;
-                if (transfer.accountFrom == (tenmoApiService.GetAccountId(tenmoApiService.UserId))) //ToDo +1000 bandaid
+                if (transfer.accountFrom == (tenmoApiService.GetAccountId(tenmoApiService.UserId)))
                 {
                     fromTo = "To:  ";
                     fromToText = $"{transfer.stringAccountTo}";
@@ -321,6 +321,12 @@ namespace TenmoClient
             int choice = console.PromptForInteger("Please choose an option ", null);
             if (choice == 1)
             {          
+                if(transfer.amount > tenmoApiService.GetBalance(tenmoApiService.UserId))
+                {
+                    console.PrintError("Insufficient funds to approve transfer. ");
+                    console.Pause();
+                    return;
+                }
                 tenmoApiService.Approve(transfer);
                 console.PrintSuccess("Successfully approved the transfer.");
                 console.Pause();
